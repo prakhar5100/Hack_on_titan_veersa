@@ -34,7 +34,6 @@ const registerUser = async (req, res) => {
         const save = await newUser.save();
 
         if (type === 'Patient') {
-            // Validate required fields for Patient
             if (!bloodGroup || !gender || !dateOfBirth) {
                 return res.status(400).json({
                     message: 'Please provide bloodGroup, gender, and dateOfBirth for a Patient.',
@@ -51,7 +50,9 @@ const registerUser = async (req, res) => {
                 dateOfBirth,
             });
             await patient.save();
-        } else if (type === 'Doctor') {
+        } 
+        
+        else if (type === 'Doctor') {
             // Create Doctor
             const doctor = new Doctor({
                 userId: newUser._id,
@@ -64,7 +65,9 @@ const registerUser = async (req, res) => {
             error: false,
             success: true,
         });
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({
             message: error.message || 'An error occurred during registration.',
             error: true,
@@ -73,4 +76,51 @@ const registerUser = async (req, res) => {
     }
 };
 
-export default registerUser;
+
+
+// User Login
+const LoginUser = async(req ,res) => {
+    const { email , password } = req.body;
+    try{
+        const user = await User.findOne({ email });
+        // Check if user exists
+        if(!user)
+        {
+            return res.status(400).json({
+                message : 'Invalid Credentials',
+                error : true,
+                success : false
+            });
+        }
+
+        if(!user.isVerified)
+        {
+            return res.status(400).json({
+                message : 'Please verify your email before login',
+                error : true,
+                success : false
+            });
+        }
+
+        // Check Password
+        const isMatch = await bcryptjs.compare(password , user.password);
+        if(!isMatch)
+        {
+            return res.status(400).json({
+                message : 'Invalid Credentials',
+                error : true,
+                success : false
+            });
+        }
+    }
+    catch(error)
+    {
+        res.status(500).json({
+            message : error.message || 'An error occured during Login',
+            error : true,
+            success : false
+        });
+    }
+}
+
+export default {registerUser , LoginUser};
