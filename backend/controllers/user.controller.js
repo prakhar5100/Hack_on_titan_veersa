@@ -6,6 +6,12 @@ import User from '../models/user.model.js';
 import Patient from '../models/patient.model.js';
 import Doctor from '../models/doctor.model.js';
 
+
+// Generating JWT Token
+const generateToken = (userId) => {
+    return jwt.sign({ userId } , process.env.JWT_SECRET, {expiresIn : '1h'});
+};
+
 // Register
 
 const registerUser = async (req, res) => {
